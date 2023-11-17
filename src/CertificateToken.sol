@@ -9,26 +9,26 @@ contract CertificateToken {
     // Token symbol
     string public _symbol;
 
-    uint public certificateCount;
+    uint256 public certificateCount;
 
     mapping(uint256 certificateID => address) private patients;
 
     mapping(address patient => bool) private CertifiedPatients;
-     /**
+    /**
      * @dev Initializes the contract by setting a `name` and a `symbol` to the token collection.
      */
+
     constructor(string memory name_, string memory symbol_) {
         _name = name_;
         _symbol = symbol_;
     }
 
-    function isCertified(address patient) public view returns(bool) {
+    function isCertified(address patient) public view returns (bool) {
         return bool(CertifiedPatients[patient]);
     }
-    function mintCertificate(address _patient) public  {
+
+    function mintCertificate(address _patient) public {
         patients[++certificateCount] = _patient;
         CertifiedPatients[_patient] = true;
-        
     }
-
 }

@@ -2,14 +2,15 @@
 pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
-import { NationalVaccinationProgram } from "../src/NationalVaccinationProgram.sol";
-import  "../src/CertificateToken.sol";
+import {NationalVaccinationProgram} from "../src/NationalVaccinationProgram.sol";
+import "../src/CertificateToken.sol";
+
 struct EnrolledPatient {
-        string Name;
-        address Addr;
-        uint LastDoseTimestamp;
-        bool Certified;
-    }
+    string Name;
+    address Addr;
+    uint256 LastDoseTimestamp;
+    bool Certified;
+}
 //
 
 contract NationalVaccineProgramTest is Test {
@@ -19,11 +20,11 @@ contract NationalVaccineProgramTest is Test {
     address user2 = makeAddr("user2");
     address user3 = makeAddr("user3");
     address user4 = makeAddr("user4");
-    string[]  names = new string[](2);
-    address[]  addr = new address[](2);
-    uint private doseNumber;
-    uint private IncentiveAmt;
-    uint private doseInterval = 3 weeks;
+    string[] names = new string[](2);
+    address[] addr = new address[](2);
+    uint256 private doseNumber;
+    uint256 private IncentiveAmt;
+    uint256 private doseInterval = 3 weeks;
     CertificateToken certificate;
 
     function setUp() public {
@@ -37,18 +38,19 @@ contract NationalVaccineProgramTest is Test {
         certificate = new CertificateToken("NonTransferableCertificate","NTC");
         RegistrationOnSetup();
     }
-    function RegistrationOnSetup()internal {  
+
+    function RegistrationOnSetup() internal {
         vm.prank(admin);
-        program.registerPatient(names,addr);
+        program.registerPatient(names, addr);
         vm.prank(user1);
         NationalVaccinationProgram.EnrolledPatient memory a = program.getMyProfile();
         assertTrue(a.Addr == user1);
     }
-    
+
     function testexpectRevertfromNonadmin() public {
         vm.startPrank(makeAddr("hacker"));
         vm.expectRevert();
-        program.registerPatient(names,addr);
+        program.registerPatient(names, addr);
         vm.stopPrank();
     }
 
@@ -58,18 +60,18 @@ contract NationalVaccineProgramTest is Test {
         certificate.mintCertificate(user2); // mints to user2
         assertTrue(certificate.isCertified(user1) == true); // test user1 balance
         assertTrue(certificate.isCertified(user2) == true); // test user2 balance
-        assertEq(certificate.certificateCount(),2); // tests that the variable `certificateCount` is increasing with minting.
+        assertEq(certificate.certificateCount(), 2); // tests that the variable `certificateCount` is increasing with minting.
     }
+
     function testProgramCertificate() public {
         program.mintCertificate(user1); // mints to user1
         program.mintCertificate(user2); // mints to user2
         assertTrue(program.isCertified(user1) == true); // test user1 balance
         assertTrue(program.isCertified(user2) == true); // test user2 balance
-        assertEq(program.certificateCount(),2);
-
+        assertEq(program.certificateCount(), 2);
     }
 
-    function testRegistration()public {  
+    function testRegistration() public {
         string[] memory namesToRegister = new string[](2);
         address[] memory addrToRegister = new address[](2);
         namesToRegister[0] = "Henry MacDonald";
@@ -77,7 +79,7 @@ contract NationalVaccineProgramTest is Test {
         addrToRegister[0] = user3;
         addrToRegister[1] = user4;
         vm.prank(admin);
-        program.registerPatient(namesToRegister,addrToRegister);
+        program.registerPatient(namesToRegister, addrToRegister);
         vm.prank(user3);
         NationalVaccinationProgram.EnrolledPatient memory a = program.getMyProfile();
         assertTrue(a.Addr == user3);
@@ -92,10 +94,11 @@ contract NationalVaccineProgramTest is Test {
         assertEq(a.DoseCount, 1);
         assertTrue(done);
     }
-    function testcertifyCompletedEnrollment()public {
+
+    function testcertifyCompletedEnrollment() public {
         vm.startPrank(admin);
         bool done;
-        for (uint i = 0; i < doseNumber; i++) {
+        for (uint256 i = 0; i < doseNumber; i++) {
             done = program.administerVaccine(user1);
             vm.warp(block.timestamp + doseInterval + 1);
         }
@@ -105,9 +108,5 @@ contract NationalVaccineProgramTest is Test {
         assertEq(a.DoseCount, doseNumber);
         assertEq(program.balanceOf(user1), IncentiveAmt);
         assertTrue(done && a.Certified);
-
-        
-
     }
-
 }
