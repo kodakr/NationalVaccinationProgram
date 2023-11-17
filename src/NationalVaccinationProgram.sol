@@ -3,6 +3,7 @@ pragma solidity ^0.8.13;
 
 import "openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 import "src/CertificateToken.sol";
+import { INationalVaccinationProgram } from "./interface/INationalVaccinationProgram.sol";
 
 //@author: https://twitter.com/Kodak_Rome
 
@@ -69,11 +70,11 @@ contract NationalVaccinationProgram is INationalVaccinationProgram, CertificateT
         uint256 _maxNumberOfDoses,
         uint256 _doseTimeInterval,
         uint256 _amt,
-        string _soulboundTokenName,
-        string _soulboundTokenSymbol,
-        string _erc20Name,
-        string _ercSymbol
-    ) CertificateToken(_soulboundTokenName, _soulboundTokenSymbol) ERC20(_erc20Name, _soulboundTokenSymbol) {
+        string memory _soulboundTokenName,
+        string memory _soulboundTokenSymbol,
+        string memory _erc20Name,
+        string memory _ercSymbol
+    ) CertificateToken(_soulboundTokenName, _soulboundTokenSymbol) ERC20(_erc20Name, _ercSymbol) {
         Admin = _admin;
         MAXNUMBEROFDOSES = _maxNumberOfDoses;
         DOSAGETIMEINTERVAL = _doseTimeInterval;

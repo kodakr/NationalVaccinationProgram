@@ -2,10 +2,13 @@
 pragma solidity ^0.8.13;
 
 import {NationalVaccinationProgram} from "./NationalVaccinationProgram.sol";
+import { IFactory } from "./interface/IFactory.sol";
 
-contract Factory {
+contract Factory is IFactory{
     mapping(bytes32 => address) register;
     uint public counter;
+
+    event ProgramDeployed(address _contract, bytes32 _uniqueId);
 
     
     function deploy(
@@ -13,16 +16,17 @@ contract Factory {
         uint256 _maxNumberOfDoses,
         uint256 _doseTimeInterval,
         uint256 _amt,
-        string _certificateTokenName,
-        string _certificateTokenSymbol,
-        string _erc20Name,
-        string _ercSymbol
+        string memory _certificateTokenName,
+        string memory _certificateTokenSymbol,
+        string memory _erc20Name,
+        string memory _ercSymbol
     ) public returns (address program) {
         bytes32 _id = generateUniqueId();
         program = address(
             new NationalVaccinationProgram{salt: _id}(_admin,_maxNumberOfDoses,_doseTimeInterval,_amt,_certificateTokenName,_certificateTokenSymbol,_erc20Name,_ercSymbol)
         );
         register[_id] = program;
+        emit ProgramDeployed(program,_id);
     }
 
     function generateUniqueId() internal returns (bytes32) {

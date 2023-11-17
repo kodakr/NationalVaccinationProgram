@@ -4,6 +4,8 @@ pragma solidity ^0.8.13;
 import "forge-std/Test.sol";
 import {NationalVaccinationProgram} from "../src/NationalVaccinationProgram.sol";
 import "../src/CertificateToken.sol";
+import {DeployScript} from "../script/NationalVaccinationProgramScript.s.sol";
+import {IFactory} from "../src/interface/IFactory.sol";
 
 struct EnrolledPatient {
     string Name;
@@ -21,11 +23,15 @@ contract NationalVaccineProgramTest is Test {
     address user3 = makeAddr("user3");
     address user4 = makeAddr("user4");
     string[] names = new string[](2);
+    string [] tokenSetup = ["CertificateTokenName","CTF","Naira","NGN"];
     address[] addr = new address[](2);
-    uint256 private doseNumber;
+    uint256 private MaxdoseNumber;
     uint256 private IncentiveAmt;
     uint256 private doseInterval = 3 weeks;
     CertificateToken certificate;
+    DeployScript script;
+    IFactory factory;
+
 
     function setUp() public {
         names[0] = "Henry Mitchelle";
@@ -33,8 +39,11 @@ contract NationalVaccineProgramTest is Test {
         addr[0] = user1;
         addr[1] = user2;
         IncentiveAmt = 1 ether;
-        doseNumber = 4;
-        program = new NationalVaccinationProgram(admin, doseNumber, doseInterval, IncentiveAmt);
+        MaxdoseNumber = 4;
+        script = new DeployScript();
+        factory = IFactory(script.run());
+        program = NationalVaccinationProgram(factory.deploy(admin, MaxdoseNumber, doseInterval, IncentiveAmt, tokenSetup[0], tokenSetup[1], tokenSetup[2], tokenSetup[3]));
+        //program = new NationalVaccinationProgram(admin, MaxdoseNumber, doseInterval, IncentiveAmt, tokenSetup[0], tokenSetup[1], tokenSetup[2], tokenSetup[3]);
         certificate = new CertificateToken("NonTransferableCertificate","NTC");
         RegistrationOnSetup();
     }
@@ -54,6 +63,8 @@ contract NationalVaccineProgramTest is Test {
         vm.stopPrank();
     }
 
+
+    //soloTest on Cert
     function testCertContract() public {
         //certificateCount
         certificate.mintCertificate(user1); // mints to user1
@@ -98,14 +109,14 @@ contract NationalVaccineProgramTest is Test {
     function testcertifyCompletedEnrollment() public {
         vm.startPrank(admin);
         bool done;
-        for (uint256 i = 0; i < doseNumber; i++) {
+        for (uint256 i = 0; i < MaxdoseNumber; i++) {
             done = program.administerVaccine(user1);
             vm.warp(block.timestamp + doseInterval + 1);
         }
         changePrank(user1);
         NationalVaccinationProgram.EnrolledPatient memory a = program.getMyProfile();
         vm.stopPrank();
-        assertEq(a.DoseCount, doseNumber);
+        assertEq(a.DoseCount, MaxdoseNumber);
         assertEq(program.balanceOf(user1), IncentiveAmt);
         assertTrue(done && a.Certified);
     }
