@@ -4,7 +4,7 @@ pragma solidity ^0.8.13;
 import "forge-std/Test.sol";
 import {NationalVaccinationProgram} from "../src/NationalVaccinationProgram.sol";
 import "../src/CertificateToken.sol";
-import {DeployScript} from "../script/NationalVaccinationProgramScript.s.sol";
+import {NationalVaccinationProgramScript} from "../script/NationalVaccinationProgramScript.s.sol";
 import {IFactory} from "../src/interface/IFactory.sol";
 
 struct EnrolledPatient {
@@ -29,7 +29,7 @@ contract NationalVaccineProgramTest is Test {
     uint256 private IncentiveAmt;
     uint256 private doseInterval = 3 weeks;
     CertificateToken certificate;
-    DeployScript script;
+    NationalVaccinationProgramScript script;
     IFactory factory;
 
 
@@ -40,7 +40,7 @@ contract NationalVaccineProgramTest is Test {
         addr[1] = user2;
         IncentiveAmt = 1 ether;
         MaxdoseNumber = 4;
-        script = new DeployScript();
+        script = new NationalVaccinationProgramScript();
         factory = IFactory(script.run());
         program = NationalVaccinationProgram(factory.deploy(admin, MaxdoseNumber, doseInterval, IncentiveAmt, tokenSetup[0], tokenSetup[1], tokenSetup[2], tokenSetup[3]));
         //program = new NationalVaccinationProgram(admin, MaxdoseNumber, doseInterval, IncentiveAmt, tokenSetup[0], tokenSetup[1], tokenSetup[2], tokenSetup[3]);

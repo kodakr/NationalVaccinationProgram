@@ -3,12 +3,14 @@ pragma solidity ^0.8.13;
 
 import {NationalVaccinationProgram} from "./NationalVaccinationProgram.sol";
 import { IFactory } from "./interface/IFactory.sol";
+import "openzeppelin-contracts/contracts/access/Ownable.sol";
 
-contract Factory is IFactory{
+contract Factory is Ownable, IFactory{
     mapping(bytes32 => address) register;
     uint public counter;
 
     event ProgramDeployed(address _contract, bytes32 _uniqueId);
+    constructor()Ownable(msg.sender) {}
 
     
     function deploy(
