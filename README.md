@@ -32,6 +32,6 @@ TestNet
     ```
 
 ## Originality
-This is an original work by me [Kodak](https://www.twitter.com/Kodak_Rome)
+This is an original work by me [Kodak](https://www.twitter.com/Kodak_Rome) and used foundry which is a top notch smart contract building and testing tool.
 - Demo: 
 - (tweet)
