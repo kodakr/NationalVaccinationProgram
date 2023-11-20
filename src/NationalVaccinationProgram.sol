@@ -65,6 +65,10 @@ contract NationalVaccinationProgram is INationalVaccinationProgram, CertificateT
     uint256 public immutable INCENTIVEAMOUNT;
     mapping(address => EnrolledPatient) private patientsDirectory;
 
+    /**
+    @dev Initializes the National Vaccination Program with parameters including admin address, maximum number of doses, 
+    dose time interval, incentive amount, and Certificate token details.
+     */
     constructor(
         address _admin,
         uint256 _maxNumberOfDoses,
@@ -87,6 +91,10 @@ contract NationalVaccinationProgram is INationalVaccinationProgram, CertificateT
         _;
     }
 
+    /**
+    @dev Registers patients by mapping their names to their addresses. Only the admin can perform this action. 
+    function is designed to take in multi amounts of data and register
+     */
     function registerPatient(string[] calldata _names, address[] calldata _patientAddresses)
         public
         onlyAdmin
@@ -106,6 +114,9 @@ contract NationalVaccinationProgram is INationalVaccinationProgram, CertificateT
         registered = true;
     }
 
+    /**
+    @dev An admin-only function. admin administeres and updates the record for pationt. Thereby maintaining accountability.
+     */
     function administerVaccine(address _patient) external onlyAdmin returns (bool) {
         //cache storage
         EnrolledPatient storage pt = patientsDirectory[_patient];
@@ -137,8 +148,12 @@ contract NationalVaccinationProgram is INationalVaccinationProgram, CertificateT
         Certified = true;
         emit EnrollmentIsCompleted(_patient);
     }
-    //Checks for only pts who have started the dose
-
+    
+    /**
+    @dev Checks the timestamp of the next dose for the caller and whether it is due.
+    Checks for only pts who have started the dose
+     */
+    
     function checkMyNextDose() public view returns (uint256 NextDose, bool Due) {
         EnrolledPatient memory pt = patientsDirectory[msg.sender];
         uint256 cache = pt.LastDoseTimestamp;
@@ -152,10 +167,12 @@ contract NationalVaccinationProgram is INationalVaccinationProgram, CertificateT
         }
     }
 
+    // The admin being a restricted role can be altered or confered on someonelse
     function proposeChangeAdmin(address _newAdmin) external onlyAdmin {
         newAdmin = _newAdmin;
     }
 
+    // A proposed (to be Admin) accepts his role by calling this. Only an already proposed address can call
     function acceptAdminRole() external returns (bool) {
         if (msg.sender != newAdmin) revert NotNominatedAdmin(newAdmin);
         emit adminChanged(Admin, newAdmin);
@@ -164,6 +181,7 @@ contract NationalVaccinationProgram is INationalVaccinationProgram, CertificateT
         return true;
     }
 
+    // Allows any registered patient to view profile.
     function getMyProfile() public view returns (EnrolledPatient memory) {
         return patientsDirectory[msg.sender];
     }
